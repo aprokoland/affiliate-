@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find Your Match — Quick Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0e0a14;
+    --surface: #1a1225;
+    --surface2: #221830;
+    --accent: #c850c0;
+    --accent2: #ffcc70;
+    --text: #f0eaf8;
+    --muted: #9b8cb0;
+    --radius: 14px;
+    --progress-fill: #c850c0;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background-image: radial-gradient(ellipse at 70% 10%, rgba(200,80,192,0.18) 0%, transparent 55%),
+                      radial-gradient(ellipse at 10% 90%, rgba(100,60,180,0.14) 0%, transparent 50%);
+  }
+
+  .wrapper {
+    width: 100%;
+    max-width: 480px;
+  }
+
+  /* Progress */
+  .progress-bar {
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 99px;
+    margin-bottom: 28px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #c850c0, #ffcc70);
+    border-radius: 99px;
+    transition: width 0.4s ease;
+  }
+
+  /* Card */
+  .card {
+    background: var(--surface);
+    border: 1px solid rgba(200,80,192,0.18);
+    border-radius: 20px;
+    padding: 36px 32px;
+  }
+
+  .step { display: none; }
+  .step.active { display: block; }
+
+  .step-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.4rem, 5vw, 1.9rem);
+    line-height: 1.25;
+    margin-bottom: 24px;
+    color: var(--text);
+  }
+
+  /* Option buttons */
+  .options { display: flex; flex-direction: column; gap: 12px; }
+
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    background: var(--surface2);
+    border: 1.5px solid rgba(255,255,255,0.07);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, transform 0.15s;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    text-align: left;
+    width: 100%;
+  }
+
+  .option:hover {
+    border-color: var(--accent);
+    background: rgba(200,80,192,0.1);
+    transform: translateX(3px);
+  }
+
+  .option.selected {
+    border-color: var(--accent);
+    background: rgba(200,80,192,0.15);
+  }
+
+  .option-icon {
+    font-size: 22px;
+    flex-shrink: 0;
+    width: 32px;
+    text-align: center;
+  }
+
+  /* CTA button */
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 17px;
+    background: linear-gradient(135deg, #c850c0 0%, #9b3bb5 100%);
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    margin-top: 20px;
+    transition: opacity 0.2s, transform 0.15s;
+    box-shadow: 0 4px 24px rgba(200,80,192,0.35);
+  }
+
+  .btn:hover { opacity: 0.92; transform: translateY(-1px); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  /* Result screen */
+  .result-screen {
+    text-align: center;
+  }
+
+  .match-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #c850c0, #ffcc70);
+    border-radius: 99px;
+    padding: 6px 18px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #0e0a14;
+    margin-bottom: 20px;
+    letter-spacing: 0.04em;
+  }
+
+  .match-score {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 15vw, 5rem);
+    font-weight: 700;
+    background: linear-gradient(135deg, #c850c0, #ffcc70);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .match-label {
+    font-size: 15px;
+    color: var(--muted);
+    margin-bottom: 28px;
+  }
+
+  .result-text {
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--muted);
+    margin-bottom: 28px;
+  }
+
+  .result-text strong {
+    color: var(--text);
+  }
+
+  .cta-note {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 12px;
+    text-align: center;
+  }
+
+  /* Trust row */
+  .trust-row {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 28px;
+    flex-wrap: wrap;
+  }
+
+  .trust-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .trust-item span { font-size: 14px; }
+
+  /* Intro screen */
+  .intro-screen { text-align: center; }
+
+  .intro-screen h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.7rem, 7vw, 2.4rem);
+    line-height: 1.2;
+    margin-bottom: 14px;
+  }
+
+  .intro-screen h1 em {
+    font-style: italic;
+    background: linear-gradient(135deg, #c850c0, #ffcc70);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .intro-sub {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 28px;
+    max-width: 360px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .time-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface2);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 99px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent2); flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress" style="width: 0%"></div>
+  </div>
+
+  <div class="card">
+
+    <!-- INTRO -->
+    <div class="step active intro-screen" id="step-intro">
+      <div class="time-pill"><span class="dot"></span> Takes about 60 seconds</div>
+      <h1>Find out who's looking for someone <em>like you</em></h1>
+      <p class="intro-sub">Answer 5 quick questions and we'll show you the type of connection you're most likely to find — no sign-up needed to see your result.</p>
+      <button class="btn" onclick="startQuiz()">Start the quiz →</button>
+      <div class="trust-row">
+        <div class="trust-item"><span>🔒</span> Private &amp; anonymous</div>
+        <div class="trust-item"><span>✓</span> No email required</div>
+        <div class="trust-item"><span>🌍</span> Available worldwide</div>
+      </div>
+    </div>
+
+    <!-- Q1 -->
+    <div class="step" id="step-1">
+      <div class="step-label">Question 1 of 5</div>
+      <h2>What kind of connection are you open to right now?</h2>
+      <div class="options">
+        <button class="option" onclick="answer(1, this)"><span class="option-icon">💬</span> Casual chat and see where it goes</button>
+        <button class="option" onclick="answer(1, this)"><span class="option-icon">🔥</span> Something fun with no pressure</button>
+        <button class="option" onclick="answer(1, this)"><span class="option-icon">💑</span> A real connection that could grow</button>
+        <button class="option" onclick="answer(1, this)"><span class="option-icon">🤷</span> Honestly just exploring</button>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="step" id="step-2">
+      <div class="step-label">Question 2 of 5</div>
+      <h2>How do you usually come across to people you're attracted to?</h2>
+      <div class="options">
+        <button class="option" onclick="answer(2, this)"><span class="option-icon">😄</span> Funny and easy to be around</button>
+        <button class="option" onclick="answer(2, this)"><span class="option-icon">🎯</span> Direct — I say what I want</button>
+        <button class="option" onclick="answer(2, this)"><span class="option-icon">🌊</span> Laid-back, I let things flow</button>
+        <button class="option" onclick="answer(2, this)"><span class="option-icon">🔮</span> A bit mysterious</button>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="step" id="step-3">
+      <div class="step-label">Question 3 of 5</div>
+      <h2>What matters most when meeting someone new?</h2>
+      <div class="options">
+        <button class="option" onclick="answer(3, this)"><span class="option-icon">⚡</span> Instant chemistry</button>
+        <button class="option" onclick="answer(3, this)"><span class="option-icon">🧠</span> Good conversation</button>
+        <button class="option" onclick="answer(3, this)"><span class="option-icon">😂</span> Making each other laugh</button>
+        <button class="option" onclick="answer(3, this)"><span class="option-icon">🤝</span> Being honest from the start</button>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="step" id="step-4">
+      <div class="step-label">Question 4 of 5</div>
+      <h2>When are you usually most available to meet or connect?</h2>
+      <div class="options">
+        <button class="option" onclick="answer(4, this)"><span class="option-icon">🌙</span> Evenings and weekends</button>
+        <button class="option" onclick="answer(4, this)"><span class="option-icon">☀️</span> Daytime when things are quieter</button>
+        <button class="option" onclick="answer(4, this)"><span class="option-icon">🌀</span> Spontaneously — whenever the mood hits</button>
+        <button class="option" onclick="answer(4, this)"><span class="option-icon">📅</span> I need to plan ahead</button>
+      </div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="step" id="step-5">
+      <div class="step-label">Question 5 of 5</div>
+      <h2>What's held you back from meeting someone interesting lately?</h2>
+      <div class="options">
+        <button class="option" onclick="answer(5, this)"><span class="option-icon">⏳</span> Just haven't had the time</button>
+        <button class="option" onclick="answer(5, this)"><span class="option-icon">📍</span> Hard to meet the right kind of people nearby</button>
+        <button class="option" onclick="answer(5, this)"><span class="option-icon">😬</span> Not sure how to start</button>
+        <button class="option" onclick="answer(5, this)"><span class="option-icon">🚀</span> Nothing — I'm ready right now</button>
+      </div>
+    </div>
+
+    <!-- RESULT -->
+    <div class="step result-screen" id="step-result">
+      <div class="match-badge">Your result is ready</div>
+      <div class="match-score" id="match-score">87%</div>
+      <div class="match-label">match compatibility in your region</div>
+      <p class="result-text">
+        Based on your answers, you have a <strong>strong match profile</strong>. People with your mindset tend to connect quickly on open-minded platforms — especially those built for adults who know what they want.<br><br>
+        The site below matches your vibe. Profiles are active, and getting started is free.
+      </p>
+      <button class="btn" id="cta-btn" onclick="goToOffer()">See who matches you →</button>
+      <p class="cta-note">Free to browse · No commitment</p>
+      <div class="trust-row">
+        <div class="trust-item"><span>🔒</span> Discreet</div>
+        <div class="trust-item"><span>✓</span> Free to join</div>
+        <div class="trust-item"><span>🌍</span> Global members</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const TOTAL_STEPS = 5;
+  let current = 0; // 0 = intro
+
+  // ← SET YOUR AFFILIATE LINK HERE
+  const OFFER_URL = 'https://your-affiliate-link.com';
+
+  function startQuiz() {
+    showStep(1);
+  }
+
+  function answer(stepNum, btn) {
+    // Briefly highlight selection
+    const siblings = btn.parentElement.querySelectorAll('.option');
+    siblings.forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+
+    setTimeout(() => {
+      if (stepNum < TOTAL_STEPS) {
+        showStep(stepNum + 1);
+      } else {
+        showResult();
+      }
+    }, 320);
+  }
+
+  function showStep(n) {
+    // Hide all
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    document.getElementById('step-' + n).classList.add('active');
+    current = n;
+    updateProgress();
+  }
+
+  function showResult() {
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    document.getElementById('step-result').classList.add('active');
+
+    // Randomize score between 82–96 for freshness
+    const score = Math.floor(Math.random() * 15) + 82;
+    document.getElementById('match-score').textContent = score + '%';
+
+    updateProgress(100);
+  }
+
+  function updateProgress(override) {
+    const pct = override !== undefined ? override : ((current / TOTAL_STEPS) * 100);
+    document.getElementById('progress').style.width = pct + '%';
+  }
+
+  function goToOffer() {
+    const btn = document.getElementById('cta-btn');
+    btn.textContent = 'Loading your matches…';
+    btn.disabled = true;
+    setTimeout(() => {
+      window.location.href = OFFER_URL;
+    }, 900);
+  }
+</script>
+</body>
+</html>
