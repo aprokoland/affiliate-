@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Find Your Match — Quick Quiz</title>
+<title>Dating Style Quiz — ReviewLab</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -17,7 +17,6 @@
     --text: #f0eaf8;
     --muted: #9b8cb0;
     --radius: 14px;
-    --progress-fill: #c850c0;
   }
 
   body {
@@ -29,7 +28,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 20px 20px 60px;
     background-image: radial-gradient(ellipse at 70% 10%, rgba(200,80,192,0.18) 0%, transparent 55%),
                       radial-gradient(ellipse at 10% 90%, rgba(100,60,180,0.14) 0%, transparent 50%);
   }
@@ -39,7 +38,20 @@
     max-width: 480px;
   }
 
-  /* Progress */
+  .site-name {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    margin-bottom: 18px;
+    text-transform: uppercase;
+  }
+
+  .site-name span {
+    color: var(--accent);
+  }
+
   .progress-bar {
     height: 4px;
     background: var(--surface2);
@@ -54,7 +66,6 @@
     transition: width 0.4s ease;
   }
 
-  /* Card */
   .card {
     background: var(--surface);
     border: 1px solid rgba(200,80,192,0.18);
@@ -82,7 +93,6 @@
     color: var(--text);
   }
 
-  /* Option buttons */
   .options { display: flex; flex-direction: column; gap: 12px; }
 
   .option {
@@ -120,7 +130,6 @@
     text-align: center;
   }
 
-  /* CTA button */
   .btn {
     display: block;
     width: 100%;
@@ -143,64 +152,86 @@
   .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
   /* Result screen */
-  .result-screen {
-    text-align: center;
+  .result-screen { text-align: center; }
+
+  .result-icon {
+    font-size: 52px;
+    margin-bottom: 16px;
+    display: block;
   }
 
-  .match-badge {
+  .result-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.5rem, 6vw, 2rem);
+    line-height: 1.2;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+
+  .result-type {
     display: inline-block;
     background: linear-gradient(135deg, #c850c0, #ffcc70);
     border-radius: 99px;
-    padding: 6px 18px;
-    font-size: 13px;
+    padding: 7px 20px;
+    font-size: 14px;
     font-weight: 700;
     color: #0e0a14;
-    margin-bottom: 20px;
-    letter-spacing: 0.04em;
-  }
-
-  .match-score {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(3rem, 15vw, 5rem);
-    font-weight: 700;
-    background: linear-gradient(135deg, #c850c0, #ffcc70);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    line-height: 1;
-    margin-bottom: 8px;
-  }
-
-  .match-label {
-    font-size: 15px;
-    color: var(--muted);
-    margin-bottom: 28px;
+    margin-bottom: 22px;
   }
 
   .result-text {
-    font-size: 16px;
-    line-height: 1.65;
+    font-size: 15px;
+    line-height: 1.7;
     color: var(--muted);
-    margin-bottom: 28px;
+    margin-bottom: 24px;
+    text-align: left;
   }
 
-  .result-text strong {
+  .result-text strong { color: var(--text); }
+
+  .recommendation-box {
+    background: var(--surface2);
+    border: 1px solid rgba(200,80,192,0.25);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    text-align: left;
+  }
+
+  .rec-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .rec-title {
+    font-size: 16px;
+    font-weight: 700;
     color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .rec-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
   }
 
   .cta-note {
     font-size: 12px;
     color: var(--muted);
-    margin-top: 12px;
+    margin-top: 10px;
     text-align: center;
   }
 
-  /* Trust row */
   .trust-row {
     display: flex;
     justify-content: center;
     gap: 20px;
-    margin-top: 28px;
+    margin-top: 24px;
     flex-wrap: wrap;
   }
 
@@ -212,9 +243,7 @@
     color: var(--muted);
   }
 
-  .trust-item span { font-size: 14px; }
-
-  /* Intro screen */
+  /* Intro */
   .intro-screen { text-align: center; }
 
   .intro-screen h1 {
@@ -256,11 +285,54 @@
   }
 
   .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent2); flex-shrink: 0; }
+
+  /* Age gate */
+  .age-gate {
+    background: var(--surface2);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-top: 18px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .age-gate label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+  }
+
+  .age-gate input[type="checkbox"] {
+    margin-top: 2px;
+    accent-color: var(--accent);
+    flex-shrink: 0;
+    width: 15px;
+    height: 15px;
+  }
+
+  /* Footer */
+  .footer {
+    margin-top: 24px;
+    text-align: center;
+    font-size: 11px;
+    color: #5a4e6a;
+    line-height: 1.6;
+  }
+
+  .footer a {
+    color: #7a6a8a;
+    text-decoration: underline;
+  }
 </style>
 </head>
 <body>
 
 <div class="wrapper">
+  <div class="site-name">Review<span>Lab</span> · Dating Guide</div>
+
   <div class="progress-bar">
     <div class="progress-fill" id="progress" style="width: 0%"></div>
   </div>
@@ -270,13 +342,21 @@
     <!-- INTRO -->
     <div class="step active intro-screen" id="step-intro">
       <div class="time-pill"><span class="dot"></span> Takes about 60 seconds</div>
-      <h1>Find out who's looking for someone <em>like you</em></h1>
-      <p class="intro-sub">Answer 5 quick questions and we'll show you the type of connection you're most likely to find — no sign-up needed to see your result.</p>
-      <button class="btn" onclick="startQuiz()">Start the quiz →</button>
+      <h1>What kind of connection are you <em>really</em> looking for?</h1>
+      <p class="intro-sub">Answer 5 quick questions and we'll recommend the best platform for your dating style — no sign-up needed to see your result.</p>
+
+      <div class="age-gate">
+        <label>
+          <input type="checkbox" id="age-confirm" onchange="toggleStart()">
+          <span>I confirm I am 18 years of age or older and agree to the <a href="https://reviewlab.com.ng/privacy" target="_blank">Privacy Policy</a>. This quiz recommends adult dating platforms.</span>
+        </label>
+      </div>
+
+      <button class="btn" id="start-btn" onclick="startQuiz()" disabled style="opacity:0.4;cursor:not-allowed;">Take the Quiz →</button>
       <div class="trust-row">
-        <div class="trust-item"><span>🔒</span> Private &amp; anonymous</div>
-        <div class="trust-item"><span>✓</span> No email required</div>
-        <div class="trust-item"><span>🌍</span> Available worldwide</div>
+        <div class="trust-item"><span>🔒</span> Anonymous</div>
+        <div class="trust-item"><span>✓</span> No email needed</div>
+        <div class="trust-item"><span>🌍</span> Worldwide</div>
       </div>
     </div>
 
@@ -334,7 +414,7 @@
       <h2>What's held you back from meeting someone interesting lately?</h2>
       <div class="options">
         <button class="option" onclick="answer(5, this)"><span class="option-icon">⏳</span> Just haven't had the time</button>
-        <button class="option" onclick="answer(5, this)"><span class="option-icon">📍</span> Hard to meet the right kind of people nearby</button>
+        <button class="option" onclick="answer(5, this)"><span class="option-icon">📍</span> Hard to meet the right kind of people</button>
         <button class="option" onclick="answer(5, this)"><span class="option-icon">😬</span> Not sure how to start</button>
         <button class="option" onclick="answer(5, this)"><span class="option-icon">🚀</span> Nothing — I'm ready right now</button>
       </div>
@@ -342,38 +422,71 @@
 
     <!-- RESULT -->
     <div class="step result-screen" id="step-result">
-      <div class="match-badge">Your result is ready</div>
-      <div class="match-score" id="match-score">87%</div>
-      <div class="match-label">match compatibility in your region</div>
+      <span class="result-icon">💜</span>
+      <h2 class="result-heading">Here's our recommendation for you</h2>
+      <div class="result-type" id="result-type">Open-Minded Explorer</div>
+
       <p class="result-text">
-        Based on your answers, you have a <strong>strong match profile</strong>. People with your mindset tend to connect quickly on open-minded platforms — especially those built for adults who know what they want.<br><br>
-        The site below matches your vibe. Profiles are active, and getting started is free.
+        Based on your answers, you seem like someone who values <strong>genuine connection without the pressure</strong> of traditional dating. You'd do well on platforms built for adults who are honest about what they want.<br><br>
+        We reviewed several options and the one below consistently scores well for ease of use, active members, and a no-judgement atmosphere.
       </p>
-      <button class="btn" id="cta-btn" onclick="goToOffer()">See who matches you →</button>
-      <p class="cta-note">Free to browse · No commitment</p>
+
+      <div class="recommendation-box">
+        <div class="rec-label">Our pick for your style</div>
+        <div class="rec-title">Open-Minded Singles Platform</div>
+        <div class="rec-desc">Large global community · Free to browse · Adults only · No pressure environment</div>
+      </div>
+
+      <button class="btn" id="cta-btn" onclick="goToOffer()">Visit Our Top Pick →</button>
+      <p class="cta-note">Free to join · No commitment required</p>
+
       <div class="trust-row">
         <div class="trust-item"><span>🔒</span> Discreet</div>
-        <div class="trust-item"><span>✓</span> Free to join</div>
+        <div class="trust-item"><span>✓</span> Free to browse</div>
         <div class="trust-item"><span>🌍</span> Global members</div>
       </div>
     </div>
 
   </div>
+
+  <div class="footer">
+    © 2024 ReviewLab · <a href="https://reviewlab.com.ng/privacy" target="_blank">Privacy Policy</a> · <a href="https://reviewlab.com.ng" target="_blank">reviewlab.com.ng</a><br>
+    This site contains affiliate links. We may earn a commission if you sign up through our recommendations, at no extra cost to you. All recommended platforms are for adults aged 18 and over.
+  </div>
 </div>
 
 <script>
   const TOTAL_STEPS = 5;
-  let current = 0; // 0 = intro
+  let current = 0;
 
-  // ← SET YOUR AFFILIATE LINK HERE
-  const OFFER_URL = 'https://your-affiliate-link.com';
+  const OFFER_URL = 'https://reviewlab.com.ng/';
+
+  const RESULT_TYPES = [
+    'Open-Minded Explorer',
+    'Confident Connector',
+    'The Spontaneous Type',
+    'Genuine Connection Seeker'
+  ];
+
+  function toggleStart() {
+    const cb = document.getElementById('age-confirm');
+    const btn = document.getElementById('start-btn');
+    if (cb.checked) {
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.style.cursor = 'pointer';
+    } else {
+      btn.disabled = true;
+      btn.style.opacity = '0.4';
+      btn.style.cursor = 'not-allowed';
+    }
+  }
 
   function startQuiz() {
     showStep(1);
   }
 
   function answer(stepNum, btn) {
-    // Briefly highlight selection
     const siblings = btn.parentElement.querySelectorAll('.option');
     siblings.forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
@@ -388,22 +501,20 @@
   }
 
   function showStep(n) {
-    // Hide all
     document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
     document.getElementById('step-' + n).classList.add('active');
     current = n;
     updateProgress();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function showResult() {
     document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
     document.getElementById('step-result').classList.add('active');
-
-    // Randomize score between 82–96 for freshness
-    const score = Math.floor(Math.random() * 15) + 82;
-    document.getElementById('match-score').textContent = score + '%';
-
+    const type = RESULT_TYPES[Math.floor(Math.random() * RESULT_TYPES.length)];
+    document.getElementById('result-type').textContent = type;
     updateProgress(100);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function updateProgress(override) {
@@ -413,11 +524,11 @@
 
   function goToOffer() {
     const btn = document.getElementById('cta-btn');
-    btn.textContent = 'Loading your matches…';
+    btn.textContent = 'Taking you there…';
     btn.disabled = true;
     setTimeout(() => {
-      window.location.href =https://reviewlab.com.ng/;
-    }, 900);
+      window.location.href = OFFER_URL;
+    }, 800);
   }
 </script>
 </body>
