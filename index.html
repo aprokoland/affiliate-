@@ -1,535 +1,152 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dating Style Quiz — ReviewLab</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --bg: #0e0a14;
-    --surface: #1a1225;
-    --surface2: #221830;
-    --accent: #c850c0;
-    --accent2: #ffcc70;
-    --text: #f0eaf8;
-    --muted: #9b8cb0;
-    --radius: 14px;
-  }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 20px 20px 60px;
-    background-image: radial-gradient(ellipse at 70% 10%, rgba(200,80,192,0.18) 0%, transparent 55%),
-                      radial-gradient(ellipse at 10% 90%, rgba(100,60,180,0.14) 0%, transparent 50%);
-  }
-
-  .wrapper {
-    width: 100%;
-    max-width: 480px;
-  }
-
-  .site-name {
-    text-align: center;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--muted);
-    letter-spacing: 0.06em;
-    margin-bottom: 18px;
-    text-transform: uppercase;
-  }
-
-  .site-name span {
-    color: var(--accent);
-  }
-
-  .progress-bar {
-    height: 4px;
-    background: var(--surface2);
-    border-radius: 99px;
-    margin-bottom: 28px;
-    overflow: hidden;
-  }
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #c850c0, #ffcc70);
-    border-radius: 99px;
-    transition: width 0.4s ease;
-  }
-
-  .card {
-    background: var(--surface);
-    border: 1px solid rgba(200,80,192,0.18);
-    border-radius: 20px;
-    padding: 36px 32px;
-  }
-
-  .step { display: none; }
-  .step.active { display: block; }
-
-  .step-label {
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    color: var(--accent);
-    margin-bottom: 10px;
-    text-transform: uppercase;
-  }
-
-  h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(1.4rem, 5vw, 1.9rem);
-    line-height: 1.25;
-    margin-bottom: 24px;
-    color: var(--text);
-  }
-
-  .options { display: flex; flex-direction: column; gap: 12px; }
-
-  .option {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 16px 18px;
-    background: var(--surface2);
-    border: 1.5px solid rgba(255,255,255,0.07);
-    border-radius: var(--radius);
-    cursor: pointer;
-    transition: border-color 0.2s, background 0.2s, transform 0.15s;
-    font-size: 15px;
-    font-weight: 500;
-    color: var(--text);
-    text-align: left;
-    width: 100%;
-  }
-
-  .option:hover {
-    border-color: var(--accent);
-    background: rgba(200,80,192,0.1);
-    transform: translateX(3px);
-  }
-
-  .option.selected {
-    border-color: var(--accent);
-    background: rgba(200,80,192,0.15);
-  }
-
-  .option-icon {
-    font-size: 22px;
-    flex-shrink: 0;
-    width: 32px;
-    text-align: center;
-  }
-
-  .btn {
-    display: block;
-    width: 100%;
-    padding: 17px;
-    background: linear-gradient(135deg, #c850c0 0%, #9b3bb5 100%);
-    color: #fff;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-    border: none;
-    border-radius: var(--radius);
-    cursor: pointer;
-    margin-top: 20px;
-    transition: opacity 0.2s, transform 0.15s;
-    box-shadow: 0 4px 24px rgba(200,80,192,0.35);
-  }
-
-  .btn:hover { opacity: 0.92; transform: translateY(-1px); }
-  .btn:active { transform: translateY(0); }
-  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-
-  /* Result screen */
-  .result-screen { text-align: center; }
-
-  .result-icon {
-    font-size: 52px;
-    margin-bottom: 16px;
-    display: block;
-  }
-
-  .result-heading {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(1.5rem, 6vw, 2rem);
-    line-height: 1.2;
-    margin-bottom: 16px;
-    color: var(--text);
-  }
-
-  .result-type {
-    display: inline-block;
-    background: linear-gradient(135deg, #c850c0, #ffcc70);
-    border-radius: 99px;
-    padding: 7px 20px;
-    font-size: 14px;
-    font-weight: 700;
-    color: #0e0a14;
-    margin-bottom: 22px;
-  }
-
-  .result-text {
-    font-size: 15px;
-    line-height: 1.7;
-    color: var(--muted);
-    margin-bottom: 24px;
-    text-align: left;
-  }
-
-  .result-text strong { color: var(--text); }
-
-  .recommendation-box {
-    background: var(--surface2);
-    border: 1px solid rgba(200,80,192,0.25);
-    border-radius: var(--radius);
-    padding: 18px 20px;
-    margin-bottom: 20px;
-    text-align: left;
-  }
-
-  .rec-label {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    color: var(--accent);
-    margin-bottom: 6px;
-  }
-
-  .rec-title {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 4px;
-  }
-
-  .rec-desc {
-    font-size: 13px;
-    color: var(--muted);
-    line-height: 1.5;
-  }
-
-  .cta-note {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 10px;
-    text-align: center;
-  }
-
-  .trust-row {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-top: 24px;
-    flex-wrap: wrap;
-  }
-
-  .trust-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: var(--muted);
-  }
-
-  /* Intro */
-  .intro-screen { text-align: center; }
-
-  .intro-screen h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(1.7rem, 7vw, 2.4rem);
-    line-height: 1.2;
-    margin-bottom: 14px;
-  }
-
-  .intro-screen h1 em {
-    font-style: italic;
-    background: linear-gradient(135deg, #c850c0, #ffcc70);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .intro-sub {
-    font-size: 15px;
-    color: var(--muted);
-    line-height: 1.6;
-    margin-bottom: 28px;
-    max-width: 360px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .time-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--surface2);
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 99px;
-    padding: 6px 14px;
-    font-size: 12px;
-    color: var(--muted);
-    margin-bottom: 24px;
-  }
-
-  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent2); flex-shrink: 0; }
-
-  /* Age gate */
-  .age-gate {
-    background: var(--surface2);
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: var(--radius);
-    padding: 14px 16px;
-    margin-top: 18px;
-    font-size: 12px;
-    color: var(--muted);
-    line-height: 1.5;
-  }
-
-  .age-gate label {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    cursor: pointer;
-  }
-
-  .age-gate input[type="checkbox"] {
-    margin-top: 2px;
-    accent-color: var(--accent);
-    flex-shrink: 0;
-    width: 15px;
-    height: 15px;
-  }
-
-  /* Footer */
-  .footer {
-    margin-top: 24px;
-    text-align: center;
-    font-size: 11px;
-    color: #5a4e6a;
-    line-height: 1.6;
-  }
-
-  .footer a {
-    color: #7a6a8a;
-    text-decoration: underline;
-  }
-</style>
-</head>
-<body>
-
-<div class="wrapper">
-  <div class="site-name">Review<span>Lab</span> · Dating Guide</div>
-
-  <div class="progress-bar">
-    <div class="progress-fill" id="progress" style="width: 0%"></div>
-  </div>
-
-  <div class="card">
-
-    <!-- INTRO -->
-    <div class="step active intro-screen" id="step-intro">
-      <div class="time-pill"><span class="dot"></span> Takes about 60 seconds</div>
-      <h1>What kind of connection are you <em>really</em> looking for?</h1>
-      <p class="intro-sub">Answer 5 quick questions and we'll recommend the best platform for your dating style — no sign-up needed to see your result.</p>
-
-      <div class="age-gate">
-        <label>
-          <input type="checkbox" id="age-confirm" onchange="toggleStart()">
-          <span>I confirm I am 18 years of age or older and agree to the <a href="https://reviewlab.com.ng/privacy" target="_blank">Privacy Policy</a>. This quiz recommends adult dating platforms.</span>
-        </label>
-      </div>
-
-      <button class="btn" id="start-btn" onclick="startQuiz()" disabled style="opacity:0.4;cursor:not-allowed;">Take the Quiz →</button>
-      <div class="trust-row">
-        <div class="trust-item"><span>🔒</span> Anonymous</div>
-        <div class="trust-item"><span>✓</span> No email needed</div>
-        <div class="trust-item"><span>🌍</span> Worldwide</div>
-      </div>
-    </div>
-
-    <!-- Q1 -->
-    <div class="step" id="step-1">
-      <div class="step-label">Question 1 of 5</div>
-      <h2>What kind of connection are you open to right now?</h2>
-      <div class="options">
-        <button class="option" onclick="answer(1, this)"><span class="option-icon">💬</span> Casual chat and see where it goes</button>
-        <button class="option" onclick="answer(1, this)"><span class="option-icon">🔥</span> Something fun with no pressure</button>
-        <button class="option" onclick="answer(1, this)"><span class="option-icon">💑</span> A real connection that could grow</button>
-        <button class="option" onclick="answer(1, this)"><span class="option-icon">🤷</span> Honestly just exploring</button>
-      </div>
-    </div>
-
-    <!-- Q2 -->
-    <div class="step" id="step-2">
-      <div class="step-label">Question 2 of 5</div>
-      <h2>How do you usually come across to people you're attracted to?</h2>
-      <div class="options">
-        <button class="option" onclick="answer(2, this)"><span class="option-icon">😄</span> Funny and easy to be around</button>
-        <button class="option" onclick="answer(2, this)"><span class="option-icon">🎯</span> Direct — I say what I want</button>
-        <button class="option" onclick="answer(2, this)"><span class="option-icon">🌊</span> Laid-back, I let things flow</button>
-        <button class="option" onclick="answer(2, this)"><span class="option-icon">🔮</span> A bit mysterious</button>
-      </div>
-    </div>
-
-    <!-- Q3 -->
-    <div class="step" id="step-3">
-      <div class="step-label">Question 3 of 5</div>
-      <h2>What matters most when meeting someone new?</h2>
-      <div class="options">
-        <button class="option" onclick="answer(3, this)"><span class="option-icon">⚡</span> Instant chemistry</button>
-        <button class="option" onclick="answer(3, this)"><span class="option-icon">🧠</span> Good conversation</button>
-        <button class="option" onclick="answer(3, this)"><span class="option-icon">😂</span> Making each other laugh</button>
-        <button class="option" onclick="answer(3, this)"><span class="option-icon">🤝</span> Being honest from the start</button>
-      </div>
-    </div>
-
-    <!-- Q4 -->
-    <div class="step" id="step-4">
-      <div class="step-label">Question 4 of 5</div>
-      <h2>When are you usually most available to meet or connect?</h2>
-      <div class="options">
-        <button class="option" onclick="answer(4, this)"><span class="option-icon">🌙</span> Evenings and weekends</button>
-        <button class="option" onclick="answer(4, this)"><span class="option-icon">☀️</span> Daytime when things are quieter</button>
-        <button class="option" onclick="answer(4, this)"><span class="option-icon">🌀</span> Spontaneously — whenever the mood hits</button>
-        <button class="option" onclick="answer(4, this)"><span class="option-icon">📅</span> I need to plan ahead</button>
-      </div>
-    </div>
-
-    <!-- Q5 -->
-    <div class="step" id="step-5">
-      <div class="step-label">Question 5 of 5</div>
-      <h2>What's held you back from meeting someone interesting lately?</h2>
-      <div class="options">
-        <button class="option" onclick="answer(5, this)"><span class="option-icon">⏳</span> Just haven't had the time</button>
-        <button class="option" onclick="answer(5, this)"><span class="option-icon">📍</span> Hard to meet the right kind of people</button>
-        <button class="option" onclick="answer(5, this)"><span class="option-icon">😬</span> Not sure how to start</button>
-        <button class="option" onclick="answer(5, this)"><span class="option-icon">🚀</span> Nothing — I'm ready right now</button>
-      </div>
-    </div>
-
-    <!-- RESULT -->
-    <div class="step result-screen" id="step-result">
-      <span class="result-icon">💜</span>
-      <h2 class="result-heading">Here's our recommendation for you</h2>
-      <div class="result-type" id="result-type">Open-Minded Explorer</div>
-
-      <p class="result-text">
-        Based on your answers, you seem like someone who values <strong>genuine connection without the pressure</strong> of traditional dating. You'd do well on platforms built for adults who are honest about what they want.<br><br>
-        We reviewed several options and the one below consistently scores well for ease of use, active members, and a no-judgement atmosphere.
-      </p>
-
-      <div class="recommendation-box">
-        <div class="rec-label">Our pick for your style</div>
-        <div class="rec-title">Open-Minded Singles Platform</div>
-        <div class="rec-desc">Large global community · Free to browse · Adults only · No pressure environment</div>
-      </div>
-
-      <button class="btn" id="cta-btn" onclick="goToOffer()">Visit Our Top Pick →</button>
-      <p class="cta-note">Free to join · No commitment required</p>
-
-      <div class="trust-row">
-        <div class="trust-item"><span>🔒</span> Discreet</div>
-        <div class="trust-item"><span>✓</span> Free to browse</div>
-        <div class="trust-item"><span>🌍</span> Global members</div>
-      </div>
-    </div>
-
-  </div>
-
-  <div class="footer">
-    © 2024 ReviewLab · <a href="https://reviewlab.com.ng/privacy" target="_blank">Privacy Policy</a> · <a href="https://reviewlab.com.ng" target="_blank">reviewlab.com.ng</a><br>
-    This site contains affiliate links. We may earn a commission if you sign up through our recommendations, at no extra cost to you. All recommended platforms are for adults aged 18 and over.
-  </div>
-</div>
-
-<script>
-  const TOTAL_STEPS = 5;
-  let current = 0;
-
-  const OFFER_URL = 'https://reviewlab.com.ng/';
-
-  const RESULT_TYPES = [
-    'Open-Minded Explorer',
-    'Confident Connector',
-    'The Spontaneous Type',
-    'Genuine Connection Seeker'
-  ];
-
-  function toggleStart() {
-    const cb = document.getElementById('age-confirm');
-    const btn = document.getElementById('start-btn');
-    if (cb.checked) {
-      btn.disabled = false;
-      btn.style.opacity = '1';
-      btn.style.cursor = 'pointer';
-    } else {
-      btn.disabled = true;
-      btn.style.opacity = '0.4';
-      btn.style.cursor = 'not-allowed';
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meet Local Singles</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 15px rgba(236, 72, 153, 0.6), 0 0 30px rgba(168, 85, 247, 0.4); }
+      50% { box-shadow: 0 0 25px rgba(236, 72, 153, 0.9), 0 0 45px rgba(168, 85, 247, 0.7); }
     }
-  }
+    .btn-gradient {
+      background: linear-gradient(135deg, #f97316 0%, #ec4899 50%, #8b5cf6 100%);
+      animation: pulseGlow 2.5s infinite ease-in-out;
+    }
+    .btn-gradient:hover {
+      transform: scale(1.03);
+      filter: brightness(1.1);
+    }
+    .bg-slide {
+      transition: opacity 1s ease-in-out;
+    }
+    .glass-card {
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+  </style>
+</head>
+<body class="bg-black text-white font-sans h-screen w-screen overflow-hidden select-none relative">
 
-  function startQuiz() {
-    showStep(1);
-  }
+  <!-- OFFER CONFIGURATION -->
+  <script>
+    const OFFER_URL = "https://u2udt.bemobtrcks.com/click";
 
-  function answer(stepNum, btn) {
-    const siblings = btn.parentElement.querySelectorAll('.option');
-    siblings.forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
-
-    setTimeout(() => {
-      if (stepNum < TOTAL_STEPS) {
-        showStep(stepNum + 1);
-      } else {
-        showResult();
+    function handleRedirect() {
+      // Haptic feedback for mobile devices
+      if (navigator.vibrate) {
+        navigator.vibrate(50);
       }
-    }, 320);
-  }
-
-  function showStep(n) {
-    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-    document.getElementById('step-' + n).classList.add('active');
-    current = n;
-    updateProgress();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  function showResult() {
-    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-    document.getElementById('step-result').classList.add('active');
-    const type = RESULT_TYPES[Math.floor(Math.random() * RESULT_TYPES.length)];
-    document.getElementById('result-type').textContent = type;
-    updateProgress(100);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  function updateProgress(override) {
-    const pct = override !== undefined ? override : ((current / TOTAL_STEPS) * 100);
-    document.getElementById('progress').style.width = pct + '%';
-  }
-
-  function goToOffer() {
-    const btn = document.getElementById('cta-btn');
-    btn.textContent = 'Taking you there…';
-    btn.disabled = true;
-    setTimeout(() => {
+      // Instant 1-step redirect to the offer link
       window.location.href = OFFER_URL;
-    }, 800);
-  }
-</script>
+    }
+  </script>
+
+  <!-- Background Image Carousel -->
+  <div id="carousel-container" class="absolute inset-0 w-full h-full z-0 overflow-hidden">
+    <div class="bg-slide absolute inset-0 w-full h-full bg-cover bg-center opacity-100 scale-105 transition-transform duration-10000" style="background-image: url('https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1200&q=80');"></div>
+    <div class="bg-slide absolute inset-0 w-full h-full bg-cover bg-center opacity-0 scale-105 transition-transform duration-10000" style="background-image: url('https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1200&q=80');"></div>
+    <div class="bg-slide absolute inset-0 w-full h-full bg-cover bg-center opacity-0 scale-105 transition-transform duration-10000" style="background-image: url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1200&q=80');"></div>
+    
+    <!-- Dark Vignette Overlay -->
+    <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-black/80"></div>
+  </div>
+
+  <!-- Top Location Bar -->
+  <div class="absolute top-4 left-0 right-0 z-20 flex justify-center px-4">
+    <div class="glass-card px-4 py-1.5 rounded-full flex items-center space-x-2 text-xs font-medium tracking-wide text-white/90 shadow-lg">
+      <span class="relative flex h-2.5 w-2.5">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+      </span>
+      <span>148 Active Matches Near <span id="user-city" class="text-pink-400 font-bold">Your Area</span></span>
+    </div>
+  </div>
+
+  <!-- Carousel Navigation Arrows -->
+  <button onclick="prevSlide()" class="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md flex items-center justify-center transition-all duration-200 active:scale-90">
+    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+  </button>
+
+  <button onclick="nextSlide()" class="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md flex items-center justify-center transition-all duration-200 active:scale-90">
+    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+  </button>
+
+  <!-- Central Question Card (Single Step with Updated Hook) -->
+  <div class="absolute inset-0 z-30 flex flex-col items-center justify-start pt-28 px-6">
+    <div class="w-full max-w-sm flex flex-col items-center text-center space-y-5">
+      
+      <h1 class="text-xl sm:text-2xl font-bold text-white drop-shadow-md tracking-tight">
+        Are you ready to meet new women in your area today?
+      </h1>
+
+      <!-- Direct 1-Click Buttons -->
+      <div class="flex items-center space-x-4 w-full max-w-xs">
+        <button onclick="handleRedirect()" class="w-1/2 py-3 rounded-full bg-white text-gray-900 font-bold text-base transition-all duration-200 shadow-lg active:scale-95 hover:bg-gray-100">
+          No
+        </button>
+        
+        <button onclick="handleRedirect()" class="w-1/2 py-3 rounded-full btn-gradient text-white font-bold text-base transition-all duration-200 shadow-xl active:scale-95">
+          Yes
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Carousel Slide Indicators -->
+  <div class="absolute bottom-6 left-0 right-0 z-20 flex justify-center space-x-2">
+    <div class="dot w-2 h-2 rounded-full bg-white transition-all duration-300"></div>
+    <div class="dot w-2 h-2 rounded-full bg-white/40 transition-all duration-300"></div>
+    <div class="dot w-2 h-2 rounded-full bg-white/40 transition-all duration-300"></div>
+  </div>
+
+  <script>
+    // Geo-Location Detection
+    async function initGeo() {
+      try {
+        const res = await fetch('https://ipapi.co/json/');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.city) {
+            document.getElementById('user-city').textContent = data.city;
+          }
+        }
+      } catch (e) {
+        console.log("Geo lookup skipped");
+      }
+    }
+    initGeo();
+
+    // Carousel Logic
+    const slides = document.querySelectorAll('.bg-slide');
+    const dots = document.querySelectorAll('.dot');
+    let currentSlide = 0;
+
+    function showSlide(index) {
+      slides.forEach((slide, i) => {
+        slide.style.opacity = i === index ? '1' : '0';
+      });
+      dots.forEach((dot, i) => {
+        dot.className = `dot rounded-full transition-all duration-300 ${i === index ? 'w-5 bg-pink-500' : 'w-2 bg-white/40'}`;
+      });
+      currentSlide = index;
+    }
+
+    function nextSlide() {
+      showSlide((currentSlide + 1) % slides.length);
+    }
+
+    function prevSlide() {
+      showSlide((currentSlide - 1 + slides.length) % slides.length);
+    }
+
+    // Auto-advance background every 4 seconds
+    setInterval(nextSlide, 4000);
+  </script>
+
 </body>
 </html>
